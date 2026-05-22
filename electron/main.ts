@@ -41,19 +41,35 @@ function startServer(port: number): Promise<void> {
       stdio: ['ignore', 'pipe', 'pipe']
     });
 
+    let settled = false;
+    let stdoutBuf = '';
+
+    const timeout = setTimeout(() => {
+      if (!settled) reject(new Error('Server startup timed out after 60 seconds'));
+    }, 60_000);
+
     serverProcess.stdout?.on('data', (data: Buffer) => {
-      const text = data.toString();
-      process.stdout.write(text);
-      if (text.includes('[server] Index ready.')) resolve();
+      stdoutBuf += data.toString();
+      process.stdout.write(data);
+      if (!settled && stdoutBuf.includes('[server] Index ready.')) {
+        clearTimeout(timeout);
+        settled = true;
+        resolve();
+      }
     });
 
     serverProcess.stderr?.on('data', (data: Buffer) => {
       process.stderr.write(data.toString());
     });
 
-    serverProcess.on('error', reject);
+    serverProcess.on('error', (err) => {
+      clearTimeout(timeout);
+      reject(err);
+    });
+
     serverProcess.on('exit', (code) => {
-      if (code !== 0 && code !== null) reject(new Error(`Server exited with code ${code}`));
+      clearTimeout(timeout);
+      if (!settled) reject(new Error(`Server exited (code ${code ?? 'null'}) before emitting ready signal`));
     });
   });
 }
@@ -90,8 +106,13 @@ ipcMain.handle('api-key:get', () => {
 });
 
 ipcMain.handle('api-key:save', (_event, key: string) => {
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error('Encryption not available on this system');
+  }
   const encrypted = safeStorage.encryptString(key);
-  fs.writeFileSync(settingsPath, JSON.stringify({ encryptedKey: encrypted.toString('base64') }), 'utf-8');
+  const tmp = settingsPath + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify({ encryptedKey: encrypted.toString('base64') }), 'utf-8');
+  fs.renameSync(tmp, settingsPath);
 });
 
 app.whenReady().then(async () => {
