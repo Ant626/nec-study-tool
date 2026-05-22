@@ -31,11 +31,14 @@ export function reconstructPageText(
   for (const item of filtered) {
     const y = item.transform[5];
     const x = item.transform[4];
-    let lineKey: number | undefined;
+    let nearest: number | undefined;
+    let nearestDist = Infinity;
     for (const key of lineMap.keys()) {
-      if (Math.abs(key - y) <= Y_TOLERANCE) { lineKey = key; break; }
+      const dist = Math.abs(key - y);
+      if (dist <= Y_TOLERANCE && dist < nearestDist) { nearest = key; nearestDist = dist; }
     }
-    if (lineKey === undefined) { lineKey = y; lineMap.set(lineKey, []); }
+    const lineKey = nearest ?? y;
+    if (!lineMap.has(lineKey)) lineMap.set(lineKey, []);
     lineMap.get(lineKey)!.push({ str: item.str, x });
   }
 
