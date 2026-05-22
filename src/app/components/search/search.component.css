@@ -16,7 +16,6 @@
 }
 .result-item {
   cursor: pointer;
-  height: auto !important;
   padding: 12px 0;
 }
 .result-item:hover { background: #f5f5f5; }

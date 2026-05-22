@@ -1,5 +1,6 @@
 // src/app/components/browse/browse.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,11 +20,13 @@ export class BrowseComponent implements OnInit {
   loadingArticles = false;
   loadingArticle = false;
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(private necApi: NecApiService) {}
 
   ngOnInit(): void {
     this.loadingArticles = true;
-    this.necApi.getArticles().subscribe({
+    this.necApi.getArticles().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: articles => {
         this.articles = articles;
         this.loadingArticles = false;
@@ -36,7 +39,7 @@ export class BrowseComponent implements OnInit {
   selectArticle(id: string): void {
     if (this.selectedArticle?.id === id) return;
     this.loadingArticle = true;
-    this.necApi.getArticle(id).subscribe({
+    this.necApi.getArticle(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: article => { this.selectedArticle = article; this.loadingArticle = false; },
       error: () => { this.loadingArticle = false; }
     });
