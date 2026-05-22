@@ -58,4 +58,10 @@ describe('SearchService', () => {
     const results = service.search('branch');
     expect(results[0].score).toBeGreaterThan(0);
   });
+
+  it('does not append ellipsis when content fits in snippet window', () => {
+    const results = service.search('terms');
+    // The mock content "This article defines essential terms..." is short enough to fit in 220 chars
+    expect(results[0].snippet).not.toMatch(/…$/);
+  });
 });

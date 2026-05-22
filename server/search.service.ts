@@ -52,6 +52,8 @@ export class SearchService {
     const term = query.toLowerCase().split(/\s+/)[0];
     const idx = content.toLowerCase().indexOf(term);
     const start = idx > 60 ? idx - 60 : 0;
-    return content.slice(start, start + 220).trim() + '…';
+    const excerpt = content.slice(start, start + 220).trim();
+    const isTruncated = start + 220 < content.length;
+    return isTruncated ? excerpt + '…' : excerpt;
   }
 }

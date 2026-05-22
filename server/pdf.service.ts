@@ -1,5 +1,5 @@
 // server/pdf.service.ts
-import { readFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import type { NecArticle, NecSection } from './types';
 
 const ARTICLE_RE = /^ARTICLE\s+(\d+)\s*[–\-—]?\s*(.*)/i;
@@ -63,11 +63,15 @@ export class PdfService {
   private articles: NecArticle[] = [];
 
   async load(pdfPath: string): Promise<void> {
-    const pdfParse = (await import('pdf-parse')).default;
-    const buffer = readFileSync(pdfPath);
-    const data = await pdfParse(buffer);
-    this.articles = parseNecText(data.text);
-    console.log(`[PdfService] Loaded ${this.articles.length} articles`);
+    try {
+      const buffer = await readFile(pdfPath);
+      const pdfParse = (await import('pdf-parse')).default;
+      const data = await pdfParse(buffer);
+      this.articles = parseNecText(data.text);
+      console.log(`[PdfService] Loaded ${this.articles.length} articles`);
+    } catch (err) {
+      throw new Error(`[PdfService] Failed to load PDF at "${pdfPath}": ${(err as Error).message}`);
+    }
   }
 
   getArticles(): NecArticle[] { return this.articles; }
