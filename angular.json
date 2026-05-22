@@ -32,7 +32,8 @@
             "prerender": true,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "externalDependencies": ["pdf-parse"]
           },
           "configurations": {
             "production": {

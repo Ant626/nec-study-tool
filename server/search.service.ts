@@ -23,22 +23,25 @@ export class SearchService {
   });
 
   build(articles: NecArticle[]): void {
+    const seen = new Set<string>();
     const docs = articles.flatMap(article =>
-      article.sections.map(s => ({
-        id: s.id,
-        articleId: s.articleId,
-        sectionNumber: s.sectionNumber,
-        sectionTitle: s.sectionTitle,
-        articleTitle: article.title,
-        content: s.content.slice(0, 500)
-      }))
+      article.sections
+        .filter(s => !seen.has(s.id) && seen.add(s.id))
+        .map(s => ({
+          id: s.id,
+          articleId: s.articleId,
+          sectionNumber: s.sectionNumber,
+          sectionTitle: s.sectionTitle,
+          articleTitle: article.title,
+          content: s.content.slice(0, 500)
+        }))
     );
     this.index.addAll(docs);
   }
 
   search(query: string, limit = 20): SearchResult[] {
     if (query.trim().length < 2) return [];
-    return this.index.search(query, { limit }).map(r => ({
+    return this.index.search(query).slice(0, limit).map(r => ({
       id: r.id,
       articleId: r['articleId'] as string,
       sectionNumber: r['sectionNumber'] as string,

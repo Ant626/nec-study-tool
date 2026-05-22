@@ -1,0 +1,4 @@
+[server] Loading PDF…
+[PdfService] Loaded 146 articles
+[server] Index ready.
+Node Express server listening on http://localhost:4000
