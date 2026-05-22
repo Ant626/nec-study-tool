@@ -1,0 +1,31 @@
+<!-- src/app/components/search/search.component.html -->
+<div class="search-container">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search NEC</mat-label>
+    <input matInput [(ngModel)]="query" (ngModelChange)="onQueryChange()"
+           placeholder="e.g. branch circuit, grounding electrode">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  @if (searching) {
+    <div class="center-spinner"><mat-spinner diameter="36"></mat-spinner></div>
+  }
+
+  @if (searched && !searching) {
+    @if (results.length === 0) {
+      <p class="no-results">No results found for "{{ query }}"</p>
+    } @else {
+      <p class="result-count">{{ results.length }} result(s)</p>
+      <mat-list>
+        @for (result of results; track result.id) {
+          <mat-list-item class="result-item" (click)="goToArticle()">
+            <span matListItemTitle>{{ result.sectionNumber }} — {{ result.sectionTitle }}</span>
+            <span matListItemLine>Article {{ result.articleId }}</span>
+            <p class="snippet">{{ result.snippet }}</p>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        }
+      </mat-list>
+    }
+  }
+</div>
