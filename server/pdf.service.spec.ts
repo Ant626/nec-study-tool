@@ -1,6 +1,84 @@
 // server/pdf.service.spec.ts
 import { describe, it, expect } from 'vitest';
-import { parseNecText } from './pdf.service';
+import { parseNecText, reconstructPageText } from './pdf.service';
+
+// ─── reconstructPageText tests ────────────────────────────────────────────────
+
+const PAGE_HEIGHT = 792; // standard US Letter in points
+
+type MockItem = { str: string; transform: number[]; hasEOL: boolean };
+
+function item(str: string, x: number, y: number): MockItem {
+  return { str, transform: [1, 0, 0, 1, x, y], hasEOL: false };
+}
+
+describe('reconstructPageText', () => {
+  it('returns body text within the page', () => {
+    const result = reconstructPageText([item('Body text', 50, 400)], PAGE_HEIGHT);
+    expect(result).toBe('Body text');
+  });
+
+  it('filters out header items above 92% of page height', () => {
+    // y=750 > 792*0.92=729 → header zone
+    const result = reconstructPageText(
+      [item('ARTICLE 90 — INTRO', 50, 750), item('Body text', 50, 400)],
+      PAGE_HEIGHT
+    );
+    expect(result).not.toContain('ARTICLE 90 — INTRO');
+    expect(result).toContain('Body text');
+  });
+
+  it('filters out footer items below 5% of page height', () => {
+    // y=20 < 792*0.05=39.6 → footer zone
+    const result = reconstructPageText(
+      [item('42', 300, 20), item('Body text', 50, 400)],
+      PAGE_HEIGHT
+    );
+    expect(result).not.toContain('42');
+    expect(result).toContain('Body text');
+  });
+
+  it('groups items on the same line and sorts left-to-right', () => {
+    const result = reconstructPageText(
+      [item('World', 200, 400), item('Hello ', 50, 400)],
+      PAGE_HEIGHT
+    );
+    expect(result).toBe('Hello World');
+  });
+
+  it('sorts lines top-to-bottom (higher Y value = higher on page)', () => {
+    const result = reconstructPageText(
+      [item('Line 2', 50, 300), item('Line 1', 50, 500)],
+      PAGE_HEIGHT
+    );
+    const lines = result.split('\n');
+    expect(lines[0]).toBe('Line 1');
+    expect(lines[1]).toBe('Line 2');
+  });
+
+  it('groups items within 2pt Y tolerance onto the same line', () => {
+    // y=400 and y=401 should be on same line
+    const result = reconstructPageText(
+      [item('B', 100, 401), item('A ', 50, 400)],
+      PAGE_HEIGHT
+    );
+    expect(result).toBe('A B');
+  });
+
+  it('returns empty string for empty items array', () => {
+    expect(reconstructPageText([], PAGE_HEIGHT)).toBe('');
+  });
+
+  it('ignores whitespace-only items', () => {
+    const result = reconstructPageText(
+      [item('   ', 50, 400), item('Text', 100, 400)],
+      PAGE_HEIGHT
+    );
+    expect(result).toBe('Text');
+  });
+});
+
+// ─── parseNecText tests (unchanged) ───────────────────────────────────────────
 
 const SAMPLE = `
 ARTICLE 100 – Definitions
