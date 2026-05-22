@@ -1,0 +1,25 @@
+{
+  "appId": "com.nec.studyapp",
+  "productName": "NEC Study App",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist-electron/**",
+    "dist/nec-study-app/**"
+  ],
+  "asarUnpack": [
+    "dist/nec-study-app/server/**"
+  ],
+  "extraResources": [
+    { "from": "src/assets/nec-book.pdf", "to": "nec-book.pdf" }
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "src/favicon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}
