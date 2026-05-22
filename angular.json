@@ -33,7 +33,7 @@
             "ssr": {
               "entry": "server.ts"
             },
-            "externalDependencies": ["pdf-parse"]
+            "externalDependencies": ["pdfjs-dist"]
           },
           "configurations": {
             "production": {
