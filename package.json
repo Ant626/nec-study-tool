@@ -12,7 +12,7 @@
     "test:server:watch": "vitest",
     "serve:ssr:nec-study-app": "node dist/nec-study-app/server/server.mjs",
     "electron:dev": "concurrently \"ng build --watch --configuration development\" \"node scripts/electron-dev.js\"",
-    "electron:build": "ng build && tsc -p electron/tsconfig.json",
+    "electron:build": "ng build --configuration production && tsc -p electron/tsconfig.json",
     "electron:dist": "npm run electron:build && electron-builder --win",
     "electron:compile": "tsc -p electron/tsconfig.json"
   },

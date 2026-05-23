@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
   }
 
   async save(): Promise<void> {
+    if (!this.isElectron) return;
     await window.electronAPI!.saveApiKey(this.apiKey);
     this.snackBar.open('API key saved', 'OK', { duration: 3000 });
   }

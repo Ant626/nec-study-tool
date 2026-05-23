@@ -96,6 +96,7 @@ const settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
 ipcMain.handle('api-key:get', () => {
   try {
+    if (!safeStorage.isEncryptionAvailable()) return '';
     if (!fs.existsSync(settingsPath)) return '';
     const data = JSON.parse(fs.readFileSync(settingsPath, 'utf-8')) as { encryptedKey?: string };
     if (!data.encryptedKey) return '';
