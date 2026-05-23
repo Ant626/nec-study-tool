@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.nec.studytool.controller.MainController">
+
+    <top>
+        <HBox styleClass="toolbar" alignment="CENTER_LEFT" spacing="8">
+            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+            <Label text="NEC Study Tool" styleClass="toolbar-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <ToggleButton fx:id="browseButton" text="Browse"
+                          onAction="#showBrowse" styleClass="nav-button"/>
+            <ToggleButton fx:id="searchButton" text="Search"
+                          onAction="#showSearch" styleClass="nav-button"/>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="contentArea"/>
+    </center>
+</BorderPane>
