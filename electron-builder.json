@@ -6,10 +6,12 @@
   },
   "files": [
     "dist-electron/**",
-    "dist/nec-study-app/**"
+    "dist/nec-study-app/**",
+    "node_modules/pdfjs-dist/**"
   ],
   "asarUnpack": [
-    "dist/nec-study-app/server/**"
+    "dist/nec-study-app/server/**",
+    "node_modules/pdfjs-dist/**"
   ],
   "extraResources": [
     { "from": "src/assets/nec-book.pdf", "to": "nec-book.pdf" }
