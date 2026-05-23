@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.28" xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.nec.studytool.controller.BrowseController">
+
+    <VBox styleClass="sidebar">
+        <Label text="Articles" styleClass="panel-title"/>
+        <ListView fx:id="articleList" VBox.vgrow="ALWAYS"/>
+    </VBox>
+
+    <ScrollPane fitToWidth="true">
+        <VBox fx:id="sectionContainer" spacing="0" styleClass="section-container">
+            <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+        </VBox>
+    </ScrollPane>
+</SplitPane>
