@@ -12,10 +12,5 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/search/search.component').then(m => m.SearchComponent)
   },
-  {
-    path: 'settings',
-    loadComponent: () =>
-      import('./components/settings/settings.component').then(m => m.SettingsComponent)
-  },
   { path: '', redirectTo: '/browse', pathMatch: 'full' }
 ];
