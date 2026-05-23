@@ -1,5 +1,8 @@
 // server/pdf.service.ts
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
 import type { NecArticle, NecSection } from './types';
 
 // pdfjs-dist checks for DOMMatrix at module load time — stub it for Node.js 18.
@@ -115,7 +118,11 @@ export class PdfService {
 
   private async extractText(buffer: Buffer): Promise<string> {
     const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist/legacy/build/pdf.mjs');
-    GlobalWorkerOptions.workerSrc = '';
+    // pdfjs-dist 5.x rejects empty workerSrc. Use CJS resolution to find the worker
+    // file from pdfjs-dist's package root — works in both dev and packaged Electron.
+    const _req = createRequire(import.meta.url);
+    const workerPath = join(dirname(_req.resolve('pdfjs-dist/package.json')), 'legacy', 'build', 'pdf.worker.mjs');
+    GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
 
     const loadingTask = getDocument({ data: new Uint8Array(buffer), disableFontFace: true, verbosity: 0 });
     const pdf = await loadingTask.promise;
